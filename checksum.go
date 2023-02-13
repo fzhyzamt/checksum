@@ -12,9 +12,9 @@ import (
 	"path/filepath"
 )
 
-const HashCount = 3
+var hashNames = [...]string{"md5", "sha1", "sha256"}
 
-var hashNames = []string{"md5", "sha1", "sha256"}
+const HashCount = len(hashNames)
 
 func main() {
 	if len(os.Args) <= 1 || os.Args[1] == "" {
@@ -60,7 +60,7 @@ func GetfileHash(path string, hashArr *[HashCount]hash.Hash) (*[HashCount]string
 	defer fp.Close()
 	fileStat, _ := fp.Stat()
 	fmt.Printf("文件大小为 %d bytes\n", fileStat.Size())
-	const BuffSize = 1024 ^ 2
+	const BuffSize = 1024 * 4
 	var processedSize int64 // 已处理的文件大小
 	var nextAlter float64 = 0.05
 	buf := make([]byte, BuffSize)
@@ -78,7 +78,7 @@ func GetfileHash(path string, hashArr *[HashCount]hash.Hash) (*[HashCount]string
 			}
 		}
 		processedSize += int64(n)
-		if math.Abs(float64(processedSize) / float64(fileStat.Size()) - nextAlter) < 0.000001 {
+		if math.Abs(float64(processedSize)/float64(fileStat.Size())-nextAlter) < 0.000001 {
 			fmt.Printf("%d%%\n", int8(nextAlter*100))
 			nextAlter += 0.05
 		}
